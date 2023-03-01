@@ -1,0 +1,77 @@
+# Simple workflow for deploying App to GitHub Pages
+name: Deploy Frontend App to muon-c.github.io/reflective
+
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches: ["main"]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+  actions: write
+  checks: write
+  deployments: write
+  discussions: write
+  issues: write
+  packages: write
+  pull-requests: write
+  repository-projects: write
+  security-events: write
+  statuses: write
+
+# Allow one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+
+  deploy:
+    name: Unpack artifact and deploy React App to GH pages
+    needs: build
+    runs-on: ubuntu-22.04
+    steps: 
+      - name: Check out the GH pages repository
+        uses: actions/checkout@v3
+        with:
+          repository: 'muon-c/muon-c.github.io'
+          path: muon-c.github.io
+      
+      - name: View PWD and folder contents
+        run: (cd muon-c.github.io/reflective && pwd && ls -lta)
+
+      - name: Delete all contents inside dir
+        run: (cd muon-c.github.io && rm -rf reflective/*)
+
+      - name: View PWD and folder contents
+        run: (cd muon-c.github.io/reflective && pwd && ls -lta)
+
+      - name: Download artifact to directory 'reflective'
+        uses: actions/download-artifact@v3
+        with: 
+          name: reflective_frontend
+          path: muon-c.github.io/reflective/
+
+      - name: View PWD and folder contents
+        run: (cd muon-c.github.io/reflective && pwd && ls -lta)
+
+      - name: Expand zipped artifact
+        run: (unzip muon-c.github.io/reflective/frontend.zip -d muon-c.github.io/reflective/)
+
+      - name: View PWD and folder contents
+        run: (cd muon-c.github.io/reflective && pwd && ls -lta)
+
+      - name: Push commit to GH pages site
+        run: |
+          cd muon-c.github.io
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "via Github Actions"
+          git push
