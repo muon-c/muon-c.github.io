@@ -31,7 +31,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-
   deploy:
     name: Unpack artifact and deploy React App to GH pages
     needs: build
